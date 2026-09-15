@@ -893,8 +893,10 @@ void game_run(void)
         if (ship_was_drawn) ship_render(flame_was_drawn);
 
         if (!gameover) {
-            if (key_state & KS_LEFT)  ship_rotate((signed char)-2);
-            if (key_state & KS_RIGHT) ship_rotate((signed char)+2);
+            /* Rotation : 1 pas de 11,25° par frame à 30 Hz → tour complet en ≈ 1,1 s
+             * (2 pas venait de l'Oric à ~10-17 Hz effectifs : trop vif ici). */
+            if (key_state & KS_LEFT)  ship_rotate((signed char)-1);
+            if (key_state & KS_RIGHT) ship_rotate((signed char)+1);
             if (key_state & KS_THRUST) {
                 ship_apply_thrust();
                 if (sfx_id == FX_NONE) sound_play_fx(FX_THRUST);

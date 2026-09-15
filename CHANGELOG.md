@@ -5,6 +5,8 @@ Toutes les modifications notables du projet, par sprint et par date.
 ## [0.1.1] — 2026-09-15
 
 ### Modifié
+- Rotation du vaisseau : 1 pas (11,25°) par frame au lieu de 2 — tour complet
+  en ≈ 1,1 s à 30 Hz (retour playtest : trop rapide).
 - Écran titre : « ASTERONEO » (demande PO, ex-« ASTERORIC ») ; 9 lettres,
   même centrage. Captures de référence `title` et `controls` régénérées.
 
