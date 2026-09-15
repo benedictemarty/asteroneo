@@ -2,6 +2,12 @@
 
 Toutes les modifications notables du projet, par sprint et par date.
 
+## [Non publié]
+
+### Vérifié
+- 2026-09-16 : effets sonores et jingle validés à l'oreille par le PO dans
+  l'émulateur `neo` (« son ok ») — plus « non vérifié » sauf sur carte.
+
 ## [0.2.0] — 2026-09-15 — astéroïdes arrondis
 
 ### Ajouté

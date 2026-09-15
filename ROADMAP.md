@@ -34,16 +34,13 @@ un commit par incrément.
 - [x] Titre ASTERONEO ; rotation du vaisseau 1 pas/frame (tour en 1,1 s)
 - [x] Astéroïdes arrondis (formes Atari lissées, 24/16/10 sommets), tracé de
       polygone en asm (`poly_xor`) pour tenir la cadence
+- [x] Playtest son dans `neo` : validé par le PO le 2026-09-16 (« son ok »),
+      pas de recalibrage nécessaire
 
-- [ ] Playtest interactif dans `neo` (touches, son, cadence ressentie) et
-      calibrage des durées d'effets sonores à l'oreille
-- [ ] Vérifier la sémantique des paramètres 8,7 (slide, volume) sur le
-      firmware ; enveloppes plus fines si utile
 - [ ] Manette USB (7,1 : flèches + boutons A/B) en plus du clavier
 - [ ] Option 60 Hz (VSYNCS_PER_FRAME 1 + vitesses ÷ 2) si le rendu le permet
 - [ ] Persistance des high scores et du mapping des touches (groupe 3, fichier
       sur SD/USB)
-- [ ] Sons : chime FX_LIFE et hyperespace plus proches de l'arcade
 
 ## Sprint 3 — « Carte réelle »
 
@@ -64,4 +61,4 @@ un commit par incrément.
 |--------|------------|
 | Latence réelle des appels API supérieure à la co-sim | compteurs `dbg_frames`/`dbg_late`, plan B sprites |
 | Bugs de codegen cc65 2.19 | `--disable-opt OptStackOps`, tests de référence bit-à-bit |
-| Sons approximatifs (pas d'enveloppe matérielle) | notes en escalier de volume ; calibrage sprint 2 |
+| Sons approximatifs (pas d'enveloppe matérielle) | notes en escalier de volume ; validés à l'oreille dans `neo` (carte non testée) |
