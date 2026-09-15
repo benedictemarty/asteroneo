@@ -43,6 +43,22 @@ scenario title    ""            40000000
 scenario game     "20000000: "  60000000
 scenario controls "20000000:k"  50000000
 
+# Programmes de test cible : primitives (t_line), idempotence XOR (t_xor),
+# retour à NeoBASIC à la sortie (t_exit → PRINT 6*7 = 42).
+prog_shot() {
+    name=$1; at=$2
+    "$PHOS" "build/$name.neo" --cycles $((at + 10000)) --screenshot-at "$at:$OUT/$name.ppm" >"$OUT/$name.log" 2>&1
+    if [ "$mode" = ref ]; then cp "$OUT/$name.ppm" "$REF/$name.ppm"; echo "REF  $name"
+    elif cmp -s "$OUT/$name.ppm" "$REF/$name.ppm"; then echo "PASS $name"
+    else echo "FAIL $name (capture != $REF/$name.ppm)"; fail=1; fi
+}
+prog_shot t_line 2000000
+prog_shot t_xor  3000000
+"$PHOS" build/t_exit.neo --cycles 30000000 --type-keys '10000000:PRINT 6*7\n' \
+    --screenshot-text "$OUT/t_exit.txt" >"$OUT/t_exit.log" 2>&1
+if grep -q "^42" "$OUT/t_exit.txt"; then echo "PASS t_exit (retour NeoBASIC, 6*7 = 42)"
+else echo "FAIL t_exit (NeoBASIC ne répond pas après la sortie)"; fail=1; fi
+
 # Cadence : 255 pas de jeu sous latence API co-sim, ≤ 5 pas en retard.
 addr=$(awk '/\._dbg_frames$/ {print $2}' build/asteroneo.lbl)
 if [ -n "$addr" ]; then

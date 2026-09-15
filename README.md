@@ -52,7 +52,7 @@ dans NeoBASIC) ; en émulation : `neo asteroneo.bin@800 cold` ou
 | `↓`     | Hyperespace (téléportation, 25 % de mort) |
 | `SPACE` | Tir / démarrer / rejouer                 |
 | `K`     | (écran titre) configuration des touches  |
-| `ESC`   | Quitter (game over) / annuler (config)   |
+| `ESC`   | Quitter vers NeoBASIC (game over) / annuler (config) |
 
 Les 5 actions sont remappables sur n'importe quelle touche nommée (A-Z,
 0-9, pavé numérique, flèches, F1-F12…) ; le mapping vit en RAM.
@@ -89,7 +89,8 @@ cf. [docs/cc65-optstackops.md](docs/cc65-optstackops.md)).
   reproduisent l'EFLA du firmware (intégration 8.8, collisions, tables des
   formes, idempotence XOR, wraparound, fragmentation, table des touches).
 - `tests/run.sh` : scénarios Phosphoneo déterministes (titre, partie,
-  écran CONTROLS) comparés bit à bit à `tests/ref/*.ppm` ; cadence sous
+  écran CONTROLS, programmes `tests/emu/` : primitives, idempotence XOR,
+  retour à NeoBASIC) comparés bit à bit à `tests/ref/*.ppm` ; cadence sous
   la latence API mesurée en co-simulation sur le vrai firmware
   (`tests/latency/api-latency-cosim.txt`) ; test de fumée dans `neo`.
 

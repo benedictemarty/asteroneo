@@ -5,7 +5,6 @@
 #include "line.h"
 #include "neo_time.h"
 
-void asteroids_test_draw(unsigned char id, int cx, int cy);
 
 int main(void)
 {

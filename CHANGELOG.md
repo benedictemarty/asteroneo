@@ -27,13 +27,18 @@ Toutes les modifications notables du projet, par sprint et par date.
 - Tests host : `tests/host/test_phys.c`, `test_shapes.c` (stubs EFLA :
   idempotence XOR, sommets, wraparound, fragmentation), `test_keys.c`.
 - Tests cible : `tests/run.sh` (Phosphoneo : captures de référence titre /
-  partie / CONTROLS, cadence sous latence co-sim, fumée `neo`),
+  partie / CONTROLS, programmes `tests/emu/` t_line (primitives), t_xor
+  (idempotence des polygones), t_exit (retour NeoBASIC : PRINT 6*7 → 42),
+  cadence sous latence co-sim, fumée `neo`),
   `tests/latency/api-latency-cosim.txt` (mesure sur le vrai firmware).
 - Compteurs de diagnostic `dbg_frames` / `dbg_late` (game.c), lus par les tests.
 - Documentation : README, ROADMAP, NOTICE (périmètre Atari), CLAUDE.md,
   `docs/cc65-optstackops.md`.
 
 ### Corrigé
+- Sortie (ESC en game over) : `crt0.s` recharge NeoBASIC par l'API 1,3 puis
+  `jmp (0)`, comme le noyau au reset — `jmp ($FFFC)` relançait le jeu dans
+  les émulateurs (vecteur reset patché sur l'adresse d'exécution du .neo).
 - Polygones brouillés : bug d'optimisation cc65 2.19 (`OptStackOps`
   indexait `shape_nverts` avec l'octet bas d'un pointeur) — désactivé
   globalement + lecture de `n` avant les pointeurs.

@@ -33,3 +33,7 @@ ROADMAP.md (sprints, décisions) et CHANGELOG.md avant toute modification.
 - `signed char` en arithmétique `int` : vérifier le code généré si un
   nouveau motif d'accès apparaît (le bug OptStackOps s'est manifesté ainsi).
 - Les symboles pour les tests (`_dbg_frames`) viennent de `build/asteroneo.lbl`.
+- Phosphoneo n'accepte qu'UN `--type-keys` (le dernier gagne) : une frappe
+  = 3 trames pressée + 3 relâchée, sans pause possible entre caractères.
+  Les flèches ne sont pas typables (ASCII seulement) : remapper via CONTROLS
+  (`k` puis lettres) pour un scénario de jeu scripté.

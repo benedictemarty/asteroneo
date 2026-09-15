@@ -69,10 +69,25 @@ test: host-test emu-test
 host-test:
 	$(MAKE) -C tests/host
 
-emu-test: $(NEO)
+# Programmes de test cible (tests/emu/*.c) liés avec la couche Neo6502.
+TEST_NEO = $(BUILD)/t_exit.neo $(BUILD)/t_line.neo $(BUILD)/t_xor.neo
+
+$(BUILD)/t_exit.bin: tests/emu/t_exit.c $(BUILD)/crt0.o $(BUILD)/neo_gfx.o
+	$(CC) $(CFLAGS) -C $(CFG) -o $@ $< $(BUILD)/crt0.o $(BUILD)/neo_gfx.o none.lib
+
+$(BUILD)/t_line.bin: tests/emu/t_line.c $(BUILD)/crt0.o $(BUILD)/neo_gfx.o $(BUILD)/neo_time.o $(BUILD)/neo_sound.o
+	$(CC) $(CFLAGS) -C $(CFG) -o $@ $< $(BUILD)/crt0.o $(BUILD)/neo_gfx.o $(BUILD)/neo_time.o $(BUILD)/neo_sound.o none.lib
+
+$(BUILD)/t_xor.bin: tests/emu/t_xor.c $(BUILD)/crt0.o $(BUILD)/neo_gfx.o $(BUILD)/neo_time.o $(BUILD)/neo_sound.o $(BUILD)/asteroids.o $(BUILD)/phys.o $(BUILD)/shapes.o
+	$(CC) $(CFLAGS) -C $(CFG) -o $@ $< $(BUILD)/crt0.o $(BUILD)/neo_gfx.o $(BUILD)/neo_time.o $(BUILD)/neo_sound.o $(BUILD)/asteroids.o $(BUILD)/phys.o $(BUILD)/shapes.o none.lib
+
+$(BUILD)/t_%.neo: $(BUILD)/t_%.bin
+	python3 tools/mkneo.py $< $@ 0800 0800 "$*" >/dev/null
+
+emu-test: $(NEO) $(TEST_NEO)
 	tests/run.sh check
 
-ref: $(NEO)
+ref: $(NEO) $(TEST_NEO)
 	tests/run.sh ref
 
 clean:
