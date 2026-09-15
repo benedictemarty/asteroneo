@@ -1,0 +1,7 @@
+build/
+tests/out/
+tests/host/test_phys
+tests/host/test_shapes
+tests/host/test_keys
+*.o
+__pycache__/

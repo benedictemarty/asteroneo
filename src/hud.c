@@ -1,0 +1,204 @@
+/*
+ * hud.c — HUD Asteroids Phase 5 (port Neo6502 : coordonnées int, 320×240)
+ *
+ * Score à 5 chiffres en 7-segments (4×6 px chacun, ~6 segments tracés
+ * par chiffre, total ~30 segments XOR par redraw). Vies = mini-triangles
+ * en haut-droite. Optimisation : ne redessine que sur changement (le
+ * score change rarement comparé au framerate).
+ */
+
+#include "hud.h"
+#include "line.h"
+#include "screen.h"
+
+unsigned int  score;
+unsigned int  score_extra;
+unsigned char lives;
+unsigned char gameover;
+
+/* Reflet du dernier état affiché (HUD redessiné en XOR si != état courant) */
+static unsigned int  score_shown;
+static unsigned char lives_shown;
+static unsigned char hud_first_frame;
+
+/* 7 segments — bits de poids fort à faible : A B C D E F G */
+static const unsigned char digit_segs[10] = {
+    0x7E,   /* 0 = A B C D E F   */
+    0x30,   /* 1 = B C           */
+    0x6D,   /* 2 = A B D E G     */
+    0x79,   /* 3 = A B C D G     */
+    0x33,   /* 4 = B C F G       */
+    0x5B,   /* 5 = A C D F G     */
+    0x5F,   /* 6 = A C D E F G   */
+    0x70,   /* 7 = A B C         */
+    0x7F,   /* 8 = all           */
+    0x7B,   /* 9 = A B C D F G   */
+};
+
+#define D_W   4         /* largeur d'un chiffre */
+#define D_H   6         /* hauteur (multiple de 2) */
+#define D_HM  3         /* H / 2 */
+#define D_GAP 2         /* espace entre chiffres */
+#define D_PITCH (D_W + D_GAP)
+
+/* Position d'origine du score (haut-gauche) et des vies (haut-droite) */
+#define SCORE_X  4
+#define SCORE_Y  4
+#define LIVES_X  (SCR_W - 24)   /* à droite, 4 mini-vaisseaux max */
+#define LIVES_Y  4
+
+static void line(int x0, int y0,
+                 int x1, int y1)
+{
+    lx0 = x0; ly0 = y0; lx1 = x1; ly1 = y1;
+    draw_line_xor();
+}
+
+/* Trace les segments allumés du chiffre d, origine (px, py) */
+static void draw_digit(unsigned char d, int px, int py)
+{
+    unsigned char m = digit_segs[d];
+    /* A — top horizontal */
+    if (m & 0x40) line(px, py, px + D_W, py);
+    /* B — top right */
+    if (m & 0x20) line(px + D_W, py, px + D_W, py + D_HM);
+    /* C — bottom right */
+    if (m & 0x10) line(px + D_W, py + D_HM, px + D_W, py + D_H);
+    /* D — bottom horizontal */
+    if (m & 0x08) line(px, py + D_H, px + D_W, py + D_H);
+    /* E — bottom left */
+    if (m & 0x04) line(px, py + D_HM, px, py + D_H);
+    /* F — top left */
+    if (m & 0x02) line(px, py, px, py + D_HM);
+    /* G — middle horizontal */
+    if (m & 0x01) line(px, py + D_HM, px + D_W, py + D_HM);
+}
+
+void hud_xor_5digits(unsigned int s, int px, int py);
+
+/* Tracer un score 5 chiffres (avec zéros à gauche) à (px, py) en XOR */
+static void draw_score(unsigned int s, int px, int py)
+{
+    unsigned char d;
+    /* Décomposition par soustraction de puissances de 10 (évite la division
+     * cc65 longue) */
+    unsigned int t = s;
+    unsigned char d4 = 0;
+    while (t >= 10000U) { t -= 10000U; d4++; }
+    d = 0;
+    while (t >= 1000U)  { t -= 1000U;  d++; }
+    draw_digit(d4, px, py);
+    draw_digit(d,  px + D_PITCH, py);
+    d = 0;
+    while (t >= 100U)   { t -= 100U;   d++; }
+    draw_digit(d, px + 2 * D_PITCH, py);
+    d = 0;
+    while (t >= 10U)    { t -= 10U;    d++; }
+    draw_digit(d, px + 3 * D_PITCH, py);
+    draw_digit((unsigned char)t, px + 4 * D_PITCH, py);
+}
+
+/* Mini-triangle vaisseau (4 px haut, 3 px large) — pointe vers le haut */
+static void draw_mini_ship(int cx, int cy)
+{
+    line(cx,     cy - 2, cx - 2, cy + 2);   /* P0 → P1 */
+    line(cx,     cy - 2, cx + 2, cy + 2);   /* P0 → P2 */
+    line(cx - 2, cy + 2, cx + 2, cy + 2);   /* P1 → P2 */
+}
+
+static void draw_lives(unsigned char n, int px, int py)
+{
+    unsigned char i;
+    /* Cap à 4 icônes : la 5e dépasserait le bord droit (LIVES_X + 24 + 2
+     * > SCR_XMAX), hors du contrat de draw_line_xor.
+     * Atteignable en jeu : 3 vies + 2 extra ships à 20 000 pts. */
+    if (n > 4) n = 4;
+    for (i = 0; i < n; i++) {
+        draw_mini_ship(px + i * 6, py + 2);
+    }
+}
+
+/* Effacer (re-XOR) le HUD tel qu'affiché. À appeler AVANT hud_init lors
+ * d'un restart : sinon hud_draw redessine « 00000 » par-dessus le score
+ * final encore tracé (XOR ancien+nouveau = chiffres corrompus, résidu
+ * jamais nettoyé puisque score_shown est remis à 0). */
+void hud_erase(void)
+{
+    if (hud_first_frame) return;    /* rien d'affiché */
+    draw_score(score_shown, SCORE_X, SCORE_Y);
+    draw_lives(lives_shown, LIVES_X, LIVES_Y);
+    hud_first_frame = 1;
+}
+
+void hud_init(void)
+{
+    score = 0;
+    score_extra = HUD_EXTRA_BONUS;
+    lives = HUD_LIVES_INIT;
+    score_shown = 0;
+    lives_shown = 0;
+    hud_first_frame = 1;        /* force le 1er draw, même si score==shown==0 */
+    gameover = 0;
+}
+
+void hud_draw(void)
+{
+    if (hud_first_frame) {
+        draw_score(score, SCORE_X, SCORE_Y);
+        draw_lives(lives, LIVES_X, LIVES_Y);
+        score_shown = score;
+        lives_shown = lives;
+        hud_first_frame = 0;
+        return;
+    }
+    if (score != score_shown) {
+        draw_score(score_shown, SCORE_X, SCORE_Y);    /* effacer ancien */
+        draw_score(score, SCORE_X, SCORE_Y);           /* nouveau */
+        score_shown = score;
+    }
+    if (lives != lives_shown) {
+        draw_lives(lives_shown, LIVES_X, LIVES_Y);     /* effacer */
+        draw_lives(lives, LIVES_X, LIVES_Y);            /* nouveau */
+        lives_shown = lives;
+    }
+}
+
+/* Phase 9f : déclencher FX_LIFE depuis hud_add_score nécessiterait
+ * une dépendance à sound.h. Plus propre : exposer un flag via
+ * lives_shown vs lives, géré par game.c. Approche actuelle : ajout
+ * implicite via hud_lose_life (joueur perd, pas un bonus). Pour
+ * l'extra life, game.c surveille lives passant > sa valeur précédente. */
+void hud_add_score(unsigned int delta)
+{
+    score += delta;
+    /* score_extra == 0 = sentinelle « plus de bonus » : au-delà de
+     * 60 000, seuil suivant = 70 000 qui wraperait en 16 bits (4464)
+     * et distribuerait des extra lives en rafale. */
+    if (score_extra != 0 && score >= score_extra) {
+        lives++;
+        if (score_extra >= 60000U) score_extra = 0;
+        else                       score_extra += HUD_EXTRA_BONUS;
+    }
+}
+
+void hud_lose_life(void)
+{
+    if (lives == 0) {
+        gameover = 1;
+        return;
+    }
+    lives--;
+    if (lives == 0) gameover = 1;
+}
+
+/* Wrapper public exporté pour réutiliser draw_score (table hi-scores) */
+void hud_xor_5digits(unsigned int s, int px, int py)
+{
+    draw_score(s, px, py);
+}
+
+/* Phase 10d — wrapper public pour dessiner UN chiffre (0-9) */
+void hud_xor_digit(unsigned char d, int px, int py)
+{
+    draw_digit(d, px, py);
+}
