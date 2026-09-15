@@ -42,3 +42,25 @@ unsigned long fb_count(void)
     for (int y = 0; y < SCR_H; y++) for (int x = 0; x < SCR_W; x++) n += fb[y][x];
     return n;
 }
+
+const signed char *poly_vx, *poly_vy;
+unsigned char poly_n;
+int poly_cx, poly_cy;
+
+/* Même sémantique que _poly_xor (neo_gfx.s) : segments ]Pi-1, Pi], clip par segment. */
+void poly_xor(void)
+{
+    unsigned char i, n = poly_n;
+    int px, py, qx, qy;
+    if (n == 0) return;
+    px = poly_cx + poly_vx[n - 1]; py = poly_cy + poly_vy[n - 1];
+    for (i = 0; i < n; i++) {
+        qx = poly_cx + poly_vx[i]; qy = poly_cy + poly_vy[i];
+        if (px >= 0 && px < SCR_W && py >= 0 && py < SCR_H &&
+            qx >= 0 && qx < SCR_W && qy >= 0 && qy < SCR_H) {
+            stub_calls++;
+            efla(qx, qy, px, py);
+        }
+        px = qx; py = qy;
+    }
+}

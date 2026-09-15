@@ -29,7 +29,11 @@ un commit par incrément.
 - [x] Latence API mesurée en co-simulation sur le vrai firmware :
       ligne 5,2 ≈ 22 cycles, pixel 5,5 ≈ 5 cycles → 3 pas en retard sur 255
 
-## Sprint 2 — à planifier — « Validation et polish »
+## Sprint 2 — 2026-09-15 — « Playtest et polish » (en cours)
+
+- [x] Titre ASTERONEO ; rotation du vaisseau 1 pas/frame (tour en 1,1 s)
+- [x] Astéroïdes arrondis (formes Atari lissées, 24/16/10 sommets), tracé de
+      polygone en asm (`poly_xor`) pour tenir la cadence
 
 - [ ] Playtest interactif dans `neo` (touches, son, cadence ressentie) et
       calibrage des durées d'effets sonores à l'oreille

@@ -172,3 +172,152 @@ _draw_line_xor_open:
         lda  _ly0+1
         sta  NEO_P+7
         jmp  line_api
+
+;=================================================================
+; _poly_xor — polygone fermé en segments semi-ouverts ]Pi-1, Pi],
+; centré en (poly_cx, poly_cy), sommets signés 8 bits poly_vx/poly_vy
+; (poly_n sommets). Chaque segment dont une extrémité sort de
+; [0, 319] × [0, 239] est sauté (même compromis que la version C).
+; Remplace asteroid_poly_at (asteroids.c) : la boucle cc65 coûtait
+; ~1 500 cycles par segment, trop pour 24 sommets × 6 astéroïdes × 2.
+;
+; Entrées (ZP, écrites par le C) :
+;   _poly_vx, _poly_vy : pointeurs sur les tables de sommets
+;   _poly_n            : nombre de sommets
+;   _poly_cx, _poly_cy : centre (int)
+;=================================================================
+
+        .export   _poly_xor
+        .exportzp _poly_vx, _poly_vy, _poly_n, _poly_cx, _poly_cy
+
+SCR_W = 320
+SCR_H = 240
+
+        .zeropage
+_poly_vx: .res 2
+_poly_vy: .res 2
+_poly_n:  .res 1
+_poly_cx: .res 2
+_poly_cy: .res 2
+pidx:     .res 1        ; index du sommet courant
+ppx:      .res 2        ; sommet précédent (absolu)
+ppy:      .res 2
+pqx:      .res 2        ; sommet courant (absolu)
+pqy:      .res 2
+pflag:    .res 1        ; bit 7 = sommet précédent hors écran
+
+        .segment "CODE"
+
+; vertex_y — Y = index : pqx/pqy = centre + sommet[Y] (extension de signe)
+vertex_y:
+        lda  (_poly_vx),y
+        ldx  #0
+        cmp  #$80
+        bcc  @vx_pos
+        dex
+@vx_pos:
+        clc
+        adc  _poly_cx
+        sta  pqx
+        txa
+        adc  _poly_cx+1
+        sta  pqx+1
+        lda  (_poly_vy),y
+        ldx  #0
+        cmp  #$80
+        bcc  @vy_pos
+        dex
+@vy_pos:
+        clc
+        adc  _poly_cy
+        sta  pqy
+        txa
+        adc  _poly_cy+1
+        sta  pqy+1
+        rts
+
+; inside_q — C = 1 si (pqx, pqy) est dans l'écran
+inside_q:
+        lda  pqx+1
+        bmi  @out               ; x < 0
+        bne  @xhi               ; x >= 256
+        bra  @ychk
+@xhi:   cmp  #>SCR_W
+        bne  @out               ; x >= 512
+        lda  pqx
+        cmp  #<SCR_W
+        bcs  @out               ; x >= 320
+@ychk:  lda  pqy+1
+        bmi  @out
+        bne  @out               ; y >= 256
+        lda  pqy
+        cmp  #SCR_H
+        bcs  @out               ; y >= 240
+        sec
+        rts
+@out:   clc
+        rts
+
+_poly_xor:
+        ldy  _poly_n
+        beq  @done
+        dey
+        jsr  vertex_y           ; dernier sommet = point de départ
+        jsr  inside_q
+        ror  pflag              ; C → bit 7 (1 = dedans)
+        lda  pqx
+        sta  ppx
+        lda  pqx+1
+        sta  ppx+1
+        lda  pqy
+        sta  ppy
+        lda  pqy+1
+        sta  ppy+1
+        stz  pidx
+@loop:
+        ldy  pidx
+        jsr  vertex_y
+        jsr  inside_q
+        php
+        bcc  @skip              ; courant hors écran : pas de segment
+        bit  pflag
+        bpl  @skip              ; précédent hors écran
+        ; segment ]P, Q] = ligne Q → P (l'EFLA peint Q, exclut P)
+        jsr  wait
+        lda  pqx
+        sta  NEO_P+0
+        lda  pqx+1
+        sta  NEO_P+1
+        lda  pqy
+        sta  NEO_P+2
+        lda  pqy+1
+        sta  NEO_P+3
+        lda  ppx
+        sta  NEO_P+4
+        lda  ppx+1
+        sta  NEO_P+5
+        lda  ppy
+        sta  NEO_P+6
+        lda  ppy+1
+        sta  NEO_P+7
+        lda  #F_LINE
+        sta  NEO_FN
+        lda  #G_GRAPHICS
+        sta  NEO_CMD
+@skip:
+        plp
+        ror  pflag              ; courant devient précédent (avec son état)
+        lda  pqx
+        sta  ppx
+        lda  pqx+1
+        sta  ppx+1
+        lda  pqy
+        sta  ppy
+        lda  pqy+1
+        sta  ppy+1
+        inc  pidx
+        lda  pidx
+        cmp  _poly_n
+        bcc  @loop
+@done:
+        jmp  wait

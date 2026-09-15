@@ -2,6 +2,22 @@
 
 Toutes les modifications notables du projet, par sprint et par date.
 
+## [0.2.0] — 2026-09-15 — astéroïdes arrondis
+
+### Modifié
+- Formes des astéroïdes (retour playtest : angles droits peu naturels) :
+  les 4 silhouettes Atari sont désormais dérivées par `tools/gen_shapes.py`
+  — rééchantillonnage du contour, lissage (moyenne glissante), 24/16/10
+  sommets (fusion des sommets < 2 px), rotation propre à chaque forme
+  (13°/29°/41°/23°), relief ±4 %. Rayons 6/10/18. Tables `[12][24]`.
+- Tracé de polygone en asm (`poly_xor`, `neo_gfx.s` : clip par segment,
+  segments semi-ouverts) — la boucle C coûtait ~1 500 cycles/segment et
+  passait à 200 pas en retard / 255 avec 24 sommets ; 2 / 255 désormais.
+  Stub host équivalent dans `tests/host/stubs.c`.
+- Tests : `test_shapes` (sommets ≤ 10/16/24, tolérance d'un sommet éteint
+  par silhouette — recouvrement XOR de segments voisins), références
+  régénérées (titre, partie, CONTROLS, t_xor).
+
 ## [0.1.1] — 2026-09-15
 
 ### Modifié

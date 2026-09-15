@@ -29,8 +29,8 @@ extern unsigned char ast_break_timer;
 
 /* shapes.c (généré) */
 extern const unsigned char shape_nverts[12];
-extern const signed char  shape_vx[12][14];
-extern const signed char  shape_vy[12][14];
+extern const signed char  shape_vx[12][24];
+extern const signed char  shape_vy[12][24];
 extern const unsigned char shape_radii[3];
 
 void asteroids_init(unsigned char seed);

@@ -12,7 +12,7 @@ VIA, AY-3-8912) est remplacé par l'**API du firmware Neo6502** :
 | Oric-1 (Astéroric)                          | Neo6502 (AsteroNeo)                                   |
 |---------------------------------------------|--------------------------------------------------------|
 | HIRES 240×200 mono, Bresenham XOR maison    | mode 0 320×240, lignes/pixels XOR de l'API (5,1 / 5,2 / 5,5) |
-| astéroïdes en bitmaps pré-rendus (blit)     | polygones vectoriels arcade (11-13 sommets) tracés par le RP2040 |
+| astéroïdes en bitmaps pré-rendus (blit)     | polygones dérivés des formes arcade, lissés (24/16/10 sommets), tracés par le RP2040 (`poly_xor` asm) |
 | clavier : matrice VIA/PSG                   | Key Status par code HID (1,2), touches configurables  |
 | AY-3-8912 sous IRQ Timer 1                  | générateur 4 canaux carré/bruit, files de notes (8,7) |
 | VSync/Timer 1, 25 Hz                        | compteur de trames 60 Hz (5,37), pas de jeu à 30 Hz   |
@@ -67,7 +67,7 @@ src/hud.c         score 7 segments, vies
 src/font.c        police vectorielle A-Z 0-9 ; src/title.c labels
 src/keys.c        écran CONTROLS
 src/phys.c        intégration 8.8 (retenue) et collision torique
-src/asm/neo_gfx.s primitives XOR : gfx_init, draw_line_xor(_open), plot_dot
+src/asm/neo_gfx.s primitives XOR : gfx_init, draw_line_xor(_open), plot_dot, poly_xor
 src/neo_time.c    frame_tick / vsync_wait (5,37)
 src/neo_input.c   key_scan / key_probe / key_map (1,2), noms HID
 src/neo_sound.c   effets FX_* et jingle sur l'API son

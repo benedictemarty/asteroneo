@@ -121,37 +121,17 @@ void asteroids_update(void)
     }
 }
 
-/* Segment semi-ouvert avec clip : sauté si une extrémité est hors écran
- * (artefact d'un sommet manquant limité aux bords, comme sur Oric). */
-static void seg_clip(int x0, int y0, int x1, int y1)
-{
-    if (x0 < 0 || x0 > SCR_XMAX || y0 < 0 || y0 > SCR_YMAX) return;
-    if (x1 < 0 || x1 > SCR_XMAX || y1 < 0 || y1 > SCR_YMAX) return;
-    lx0 = x0; ly0 = y0; lx1 = x1; ly1 = y1;
-    draw_line_xor_open();
-}
-
 /* Polygone fermé de la silhouette id centré en (cx, cy) : chaque sommet
- * est l'arrivée d'exactement un segment → XOR-é une fois. */
+ * est l'arrivée d'exactement un segment → XOR-é une fois. Tracé et clip
+ * par segment en asm (poly_xor, neo_gfx.s). */
 static void asteroid_poly_at(unsigned char id, int cx, int cy)
 {
-    /* n est lu AVANT les pointeurs : cc65 2.19 (-O) croit sinon que A
-     * contient encore id après le calcul de shape_vy + id*14 et indexe
-     * shape_nverts avec l'octet bas du pointeur (polygones brouillés). */
-    unsigned char n = shape_nverts[id];
-    const signed char *vx;
-    const signed char *vy;
-    unsigned char i;
-    int px, py;
-    vx = shape_vx[id];
-    vy = shape_vy[id];
-    px = cx + vx[n - 1];
-    py = cy + vy[n - 1];
-    for (i = 0; i < n; i++) {
-        int qx = cx + vx[i], qy = cy + vy[i];
-        seg_clip(px, py, qx, qy);
-        px = qx; py = qy;
-    }
+    poly_n  = shape_nverts[id];
+    poly_vx = shape_vx[id];
+    poly_vy = shape_vy[id];
+    poly_cx = cx;
+    poly_cy = cy;
+    poly_xor();
 }
 
 /* Phase 10l — duplication d'instance : un asteroid proche d'un bord est

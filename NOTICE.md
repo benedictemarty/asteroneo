@@ -34,7 +34,8 @@ Ce projet est un **clone d'étude et de préservation** d'*Asteroids*
   6502disassembly.com). Les noms de variables d'origine sont conservés
   à des fins de traçabilité.
 - Les **formes vectorielles** (astéroïdes, vaisseau, soucoupe) dérivent
-  des données extraites de la ROM (travaux de Nick Mikstas).
+  des données extraites de la ROM (travaux de Nick Mikstas) ; les
+  astéroïdes sont lissés et rééchantillonnés par `tools/gen_shapes.py`.
 
 **Aucun droit n'est revendiqué** sur ces éléments dérivés de l'œuvre
 d'Atari, qui ne sont pas couverts par la licence EUPL ci-dessus.
