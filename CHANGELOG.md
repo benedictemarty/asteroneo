@@ -4,6 +4,9 @@ Toutes les modifications notables du projet, par sprint et par date.
 
 ## [0.2.0] — 2026-09-15 — astéroïdes arrondis
 
+### Ajouté
+- `dist/asteroneo.neo` versionné ; publication GitHub + Framagit (`asteroneo`).
+
 ### Modifié
 - Formes des astéroïdes (retour playtest : angles droits peu naturels) :
   les 4 silhouettes Atari sont désormais dérivées par `tools/gen_shapes.py`

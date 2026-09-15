@@ -20,7 +20,11 @@ VIA, AY-3-8912) est remplacé par l'**API du firmware Neo6502** :
 
 Le programme n'utilise que l'API standard du firmware amont (mode 0) : il
 tourne sur toute carte Neo6502, dans l'émulateur officiel `neo` et dans
-[Phosphoneo](../Phosphoneo) (oracle des tests).
+[Phosphoneo](https://github.com/benedictemarty/Phosphoneo) (oracle des tests).
+
+**➜ Binaire prêt à l'emploi :** [`dist/asteroneo.neo`](dist/asteroneo.neo)
+(copier sur la carte SD / clé USB, puis `run "asteroneo.neo"` dans NeoBASIC)
+ou les *Assets* de la dernière [release](../../releases/latest).
 
 ## Build
 
