@@ -5,3 +5,5 @@ tests/host/test_shapes
 tests/host/test_keys
 *.o
 __pycache__/
+memory.dump
+storage/
