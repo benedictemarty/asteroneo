@@ -8,7 +8,7 @@ un commit par incrément.
 
 | Sujet          | Décision                                                          |
 |----------------|-------------------------------------------------------------------|
-| Dépôt          | dépôt git dédié `~/Neo6502AsteroNeo` (identité bmarty <bmarty@mailo.com>) |
+| Dépôt          | `~/Neo6502AsteroNeo`, publié sur GitHub (`origin`) et Framagit (`framegit`) : `benedictemarty/asteroneo` |
 | Cible firmware | **firmware amont, mode 0** (320×240×256) — API standard uniquement |
 | Terrain        | **plein écran 320×240**, constantes adaptées (wrap, spawn, HUD)   |
 | Langage        | C cc65 (logique reprise d'Astéroric) + ca65 pour la couche API    |
