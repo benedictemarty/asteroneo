@@ -734,7 +734,7 @@ void game_run(void)
     sound_init();
     frame_target = frame_tick();
 
-    /* Écran titre : "ASTERORIC", "PRESS SPACE" clignotant, démo passive. */
+    /* Écran titre : "ASTERONEO", "PRESS SPACE" clignotant, démo passive. */
     title_draw();
     presspace_draw(TITLE_PRESS_Y);
     keyshint_draw(TITLE_HINT_Y);

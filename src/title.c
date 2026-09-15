@@ -1,5 +1,5 @@
 /*
- * title.c — Écran titre "ASTERORIC" Phase 9c — port Neo6502 : labels
+ * title.c — Écran titre "ASTERONEO" Phase 9c — port Neo6502 : labels
  * centrés sur SCR_W (320), coordonnées int
  *
  * Phase 40 : les glyphes vectoriels et draw_letter ont migré dans
@@ -13,11 +13,11 @@
 #include "hud.h"
 #include "screen.h"
 
-/* Dessine "ASTERORIC" centré horizontalement.
+/* Dessine "ASTERONEO" centré horizontalement.
  * Largeur totale = 9 * 12 - 4 = 104 pixels → x = (SCR_W - 104) / 2. */
 void title_draw(void)
 {
-    text_draw("ASTERORIC", (SCR_W - 104) / 2, 96);
+    text_draw("ASTERONEO", (SCR_W - 104) / 2, 96);
 }
 
 /* Erase = même routine (XOR idempotent) */

@@ -2,6 +2,12 @@
 
 Toutes les modifications notables du projet, par sprint et par date.
 
+## [0.1.1] — 2026-09-15
+
+### Modifié
+- Écran titre : « ASTERONEO » (demande PO, ex-« ASTERORIC ») ; 9 lettres,
+  même centrage. Captures de référence `title` et `controls` régénérées.
+
 ## [0.1.0] — 2026-09-15 — Sprint 1 « Portage jouable »
 
 ### Cadrage
