@@ -22,7 +22,10 @@ Le programme n'utilise que l'API standard du firmware amont (mode 0) : il
 tourne sur toute carte Neo6502, dans l'émulateur officiel `neo` et dans
 [Phosphoneo](https://github.com/benedictemarty/Phosphoneo) (oracle des tests).
 
+<img src="dist/cover.jpg" alt="Jaquette AsteroNeo" width="240" align="right">
+
 **➜ Binaire prêt à l'emploi :** [`dist/asteroneo.neo`](dist/asteroneo.neo)
+— jaquette : [`dist/cover.jpg`](dist/cover.jpg) (prompt dans [docs/cover-prompt.md](docs/cover-prompt.md))
 (copier sur la carte SD / clé USB, puis `run "asteroneo.neo"` dans NeoBASIC)
 ou les *Assets* de la dernière [release](../../releases/latest).
 

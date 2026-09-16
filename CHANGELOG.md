@@ -4,6 +4,10 @@ Toutes les modifications notables du projet, par sprint et par date.
 
 ## [Non publié]
 
+### Ajouté
+- 2026-09-16 : jaquette `dist/cover.jpg` (style cassette 1987, générée par
+  Gemini) et son prompt `docs/cover-prompt.md` ; vignette dans le README.
+
 ### Vérifié
 - 2026-09-16 : effets sonores et jingle validés à l'oreille par le PO dans
   l'émulateur `neo` (« son ok ») — plus « non vérifié » sauf sur carte.
