@@ -3,6 +3,7 @@
 Toutes les modifications notables du projet, par sprint et par date.
 
 ## [Non publié]
+- 2026-09-19 : `CLAUDE.md` retiré du dépôt (fichier de travail local, non publié).
 
 ### Ajouté
 - 2026-09-16 : jaquette `dist/cover.jpg` (style cassette 1987, générée par
